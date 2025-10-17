@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: springboot-devops-app
+  datasource:
+    # TODO: Provide actual DB connection details
+    # url: jdbc:postgresql://localhost:5432/your_db
+    # username: your_user
+    # password: your_password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+server:
+  # You can change the port or leave default 8080
+  port: 8080
