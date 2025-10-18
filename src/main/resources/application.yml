@@ -2,11 +2,10 @@ spring:
   application:
     name: springboot-devops-app
   datasource:
-    # TODO: Provide actual DB connection details
-    # url: jdbc:postgresql://localhost:5432/your_db
-    # username: your_user
-    # password: your_password
     driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: ankit
+    password:
   jpa:
     open-in-view: false
     hibernate:
