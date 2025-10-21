@@ -25,21 +25,19 @@ jobs:
           ./gradlew clean bootJar --no-daemon
 
       - name: Prepare SSH key and SSH into server
-        run: | 
+        run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" &> ~/.ssh/id_rsa
+          printf "%s" "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p "${{ secrets.EC2_SSH_PORT || '22' }}" "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
-        
 
       - name: Copy jar to EC2
         run: |
-          scp -o StrictHostKeyChaining=yes -i ~/.ssh/id_rsa 
-          build/libs/*.jar "${{ secrets.EC2_USER || 'ubuntu' }}@"${{ secrets.EC2_HOST }}":/home/${{ secrets.EC2_USER || 'ubuntu' }}
+          scp -P "${{ secrets.EC2_SSH_PORT || '22' }}" -o StrictHostKeyChecking=yes -i ~/.ssh/id_rsa build/libs/*.jar "${{ secrets.EC2_USER || 'ubuntu' }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER || 'ubuntu' }}/"
 
       - name: Restart app via SSH(pm2)
         run: |
-          ssh -o StrictHostKeyChaining=yes -i ~/.ssh/id_rsa "${{ secrets.EC2_USER || 'ubuntu' }}@"${{ secrets.EC2_HOST }}" -p "${{ secrets.EC2_SSH_PORT || '22' }}" << 'EOF'
+          ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_rsa -p "${{ secrets.EC2_SSH_PORT || '22' }}" "${{ secrets.EC2_USER || 'ubuntu' }}@${{ secrets.EC2_HOST }}" << 'EOF'
           pm2 restart springbootdevopsapp 
           pm2 save
           pm2 status
