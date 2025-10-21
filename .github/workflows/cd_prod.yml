@@ -34,7 +34,7 @@ jobs:
 
       - name: Copy jar to EC2
         run: |
-          scp -o StrictHostKeyChaining=yes -i ~/.ssh/id_rsa \
+          scp -o StrictHostKeyChaining=yes -i ~/.ssh/id_rsa 
           build/libs/*.jar "${{ secrets.EC2_USER || 'ubuntu' }}@"${{ secrets.EC2_HOST }}":/home/${{ secrets.EC2_USER || 'ubuntu' }}
 
       - name: Restart app via SSH(pm2)
