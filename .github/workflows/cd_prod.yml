@@ -1,0 +1,46 @@
+name:
+  CI & Deploy to prod
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Continuous-Deployment:
+
+    name : Build the jar, copy to the ec2 server and run the jar on the server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository as build is happening on the github server
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build with gradle(wrapper)
+        run: |
+          ./gradlew clean bootJar --no-daemon
+
+      - name: Prepare SSH key and SSH into server
+        run: | 
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" &> ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p "${{ secrets.EC2_SSH_PORT || '22' }}" "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
+        
+
+      - name: Copy jar to EC2
+        run: |
+          scp -o StrictHostKeyChaining=yes -i ~/.ssh/id_rsa \
+          build/libs/*.jar "${{ secrets.EC2_USER || 'ubuntu' }}@"${{ secrets.EC2_HOST }}":/home/${{ secrets.EC2_USER || 'ubuntu' }}
+
+      - name: Restart app via SSH(pm2)
+        run: |
+          ssh -o StrictHostKeyChaining=yes -i ~/.ssh/id_rsa "${{ secrets.EC2_USER || 'ubuntu' }}@"${{ secrets.EC2_HOST }}" -p "${{ secrets.EC2_SSH_PORT || '22' }}" << 'EOF'
+          pm2 restart springbootdevopsapp 
+          pm2 save
+          pm2 status
+          EOF

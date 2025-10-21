@@ -3,9 +3,9 @@ spring:
     name: springboot-devops-app
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: ankit
-    password:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
     open-in-view: false
     hibernate:
@@ -14,5 +14,4 @@ spring:
       hibernate:
         format_sql: true
 server:
-  # You can change the port or leave default 8080
-  port: 8080
+  port: ${SERVER_PORT:8080}
