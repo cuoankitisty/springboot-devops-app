@@ -38,6 +38,7 @@ jobs:
       - name: Restart app via SSH(pm2)
         run: |
           ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_rsa -p "${{ secrets.EC2_SSH_PORT || '22' }}" "${{ secrets.EC2_USER || 'ubuntu' }}@${{ secrets.EC2_HOST }}" << 'EOF'
+          source ~/.bashrc
           pm2 restart springbootdevopsapp 
           pm2 save
           pm2 status
