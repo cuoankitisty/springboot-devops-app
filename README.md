@@ -1,12 +1,12 @@
 ### Spring Boot on EC2 — Deployment Guide
 
-This guide summarizes the approaches and practical steps we discussed for deploying your Spring Boot application on Amazon EC2, with clear commands, environment-variable-based configuration, and operational tips.
+This guide summarizes the approaches and practical steps we discussed for deploying a Spring Boot application on Amazon EC2, with clear commands, environment-variable-based configuration, and operational tips.
 
 ---
 
 ### What you’ll deploy
 - A Spring Boot fat JAR built via Gradle (`bootJar`) and started with `java -jar`.
-- Configuration supplied via environment variables (no profiles required), aligned with your guideline to prefer environment variables over profiles.
+- Configuration supplied via environment variables (no profiles required)
 
 ---
 
@@ -22,9 +22,7 @@ This guide summarizes the approaches and practical steps we discussed for deploy
 
 #### Option C — Containerized deployment (optional)
 - Build a Docker image and run on EC2 directly or via ECS/Fargate.
-- Useful if you plan to scale horizontally or standardize runtime.
-
-This document details Options A and B since they match your current setup.
+- Useful if  plan to scale horizontally or standardize runtime.
 
 ---
 
@@ -183,12 +181,12 @@ java $JAVA_OPTS -jar build/libs/springboot-devops-app-0.0.1-SNAPSHOT.jar
 ---
 
 ### Networking and database checklist
-- Security group allows inbound `SERVER_PORT` (default `8080`) from your client/IP or load balancer.
+- Security group allows inbound `SERVER_PORT` (default `8080`) from  client/IP or load balancer.
 - EC2 outbound rules permit reaching the DB host:port (e.g., `5432`).
 - If using AWS RDS:
-    - RDS security group must allow inbound from your EC2 security group.
+    - RDS security group must allow inbound from EC2 security group.
     - Ensure the DB subnet group and routing allow connectivity.
-- Verify `spring.jpa.open-in-view=false` (already set per your guidelines).
+- Verify `spring.jpa.open-in-view=false` 
 - Ensure credentials are not logged; keep secrets in env files with restricted permissions (`chmod 600`).
 
 ---
@@ -219,7 +217,7 @@ journalctl -u springboot-devops-app -f
 ---
 
 ### FAQs and clarifications
-- How do I use environment variables without profiles?
+- How to use environment variables without profiles?
     - Set OS env vars (e.g., `SPRING_DATASOURCE_URL`) and Spring Boot maps them to properties automatically. Profiles are optional; you do not need them for value injection.
 - Do I need to create a separate env file?
     - Not required, but recommended for servers. With `systemd`, use `EnvironmentFile=/etc/sysconfig/springboot-devops-app` to centralize settings.
@@ -248,11 +246,9 @@ journalctl -u springboot-devops-app -f
 
 ---
 
-### Alignment with your Spring Boot guidelines
+### Alignment with Spring Boot guidelines
 - Configuration via YAML and env vars (no profiles required for values).
 - Clear transaction boundaries and disabled Open Session in View are retained.
 - Separation of layers: controllers use DTOs; entities not exposed directly.
 - Global exception handling with ProblemDetail.
 - Logging to stdout; no `System.out.println()`.
-
-If you share your exact JAR name, EC2 username/home path, and database connection details, I can generate a ready-to-paste `systemd` unit and env file tailored to your environment.
